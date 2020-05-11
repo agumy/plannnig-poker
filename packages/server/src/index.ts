@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
     const user = new User(name)
     const _room = rooms[roomId]
     console.log(_room)
-    const room = _room ? _room.addUser(user) : new Room(roomId, [user])
+    const room = _room ? _room.joinUser(user) : new Room(roomId, [user])
     rooms[roomId] = room
 
     socket.join(roomId)

@@ -12,7 +12,7 @@ export class Room implements IRoom {
     this.host = members[0].id
   }
 
-  addUser(user: User): Room {
+  joinUser(user: User): Room {
     return new Room(this.id, [...this.members, user])
   }
 }
