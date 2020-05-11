@@ -42,7 +42,9 @@ io.on('connection', (socket) => {
     io.sockets.in(roomId).emit('user-join', userJoinResponse)
   })
 
-  socket.on('start-game', ({ roomId, userId }: Schema.StartGameRequest) => {})
+  socket.on('start-game', ({ roomId }: Schema.StartGameRequest) => {
+    io.sockets.in(roomId).emit('start-game', { isPlaying: true })
+  })
 
   socket.on('draw-card', function (msg) {
     console.log(msg)
