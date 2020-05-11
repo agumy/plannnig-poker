@@ -21,7 +21,7 @@ io.on('connection', (socket) => {
   console.log('a user connected')
 
   socket.on('join-room', ({ name, roomId }: Schema.JoinRoomRequest) => {
-    const user = new User(name)
+    const user = new User(socket.id, name)
     const _room = rooms[roomId]
     console.log(_room)
     const room = _room ? _room.joinUser(user) : new Room(roomId, [user])
