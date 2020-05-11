@@ -1,0 +1,8 @@
+{
+    "watch": [
+        "src",
+        "../schema"
+    ],
+    "ext": "ts",
+    "exec": "yarn run dev"
+}
