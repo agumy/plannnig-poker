@@ -1,6 +1,8 @@
 export interface IUser {
   id: string
   name: string
+  point: number
+  isDecided: boolean
 }
 
 export interface IRoom {
@@ -34,7 +36,10 @@ export type StartGameResponse = {
 
 export type DrawCardRequest = {
   userId: string
+  roomId: string
   point: number
 }
 
-export type DrawCardResponse = {}
+export type DrawCardResponse = {
+  room: IRoom
+}

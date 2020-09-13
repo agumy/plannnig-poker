@@ -18,14 +18,16 @@ const server = http.createServer(app)
 const io = socketIO(server)
 
 io.on('connection', (socket) => {
-  console.log('a user connected')
-
   socket.on('join-room', ({ name, roomId }: Schema.JoinRoomRequest) => {
     const user = new User(socket.id, name)
-    const _room = rooms[roomId]
-    console.log(_room)
-    const room = _room ? _room.joinUser(user) : new Room(roomId, [user])
-    rooms[roomId] = room
+    let room = rooms[roomId]
+
+    if (room) {
+      room.joinUser(user)
+    } else {
+      room = new Room(roomId, user)
+      rooms[roomId] = room
+    }
 
     socket.join(roomId)
 
@@ -43,17 +45,28 @@ io.on('connection', (socket) => {
   })
 
   socket.on('start-game', ({ roomId }: Schema.StartGameRequest) => {
-    io.sockets.in(roomId).emit('start-game', { isPlaying: true })
+    const response: Schema.StartGameResponse = { isPlaying: true }
+
+    io.sockets.in(roomId).emit('start-game', response)
   })
 
-  socket.on('draw-card', function (msg) {
-    console.log(msg)
-    io.emit('chat message', msg)
-  })
+  socket.on(
+    'draw-card',
+    ({ roomId, userId, point }: Schema.DrawCardRequest) => {
+      const room = rooms[roomId]
+      if (!room) {
+        return
+      }
 
-  socket.on('disconnect', function () {
-    console.log('user disconnected')
-  })
+      room.decidePoint(userId, point)
+
+      const response: Schema.DrawCardResponse = { room }
+
+      io.sockets.in(roomId).emit('draw-card', response)
+    }
+  )
+
+  socket.on('disconnect', ({ roomId }) => {})
 })
 
 server.listen(3001, () => {

@@ -6,13 +6,33 @@ export class Room implements IRoom {
   members: User[]
   host: User['id']
 
-  constructor(id: string, members: User[]) {
+  constructor(id: string, user: User) {
     this.id = id
-    this.members = members
-    this.host = members[0].id
+    this.members = [user]
+    this.host = user.id
   }
 
-  joinUser(user: User): Room {
-    return new Room(this.id, [...this.members, user])
+  joinUser(user: User): void {
+    this.members.push(user)
+  }
+
+  leaveUser(userId: User['id']): void {
+    const members = this.members.filter((user) => user.id !== userId)
+    this.members = members
+  }
+
+  decidePoint(userId: User['id'], point: number): void {
+    const user = this.members.find((u) => u.id === userId)
+    if (user) {
+      user.decidePoint(point)
+
+      this.members = this.members.map((u) => {
+        if (u.id !== userId) {
+          return u
+        }
+
+        return user
+      })
+    }
   }
 }

@@ -2,7 +2,7 @@ import { IRoom } from '../../../schema/index'
 
 //State
 
-type State = IRoom
+export type State = IRoom
 
 export const initialState: State = {
   id: '',
@@ -18,11 +18,23 @@ export const joinRoom = (room: IRoom) =>
     payload: room,
   } as const)
 
-type Action = ReturnType<typeof joinRoom>
+export const drawCard = (room: IRoom) =>
+  ({
+    type: 'DRAW_CARD',
+    payload: room,
+  } as const)
+
+type Action = ReturnType<typeof joinRoom> | ReturnType<typeof drawCard>
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'JOIN_ROOM': {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    }
+    case 'DRAW_CARD': {
       return {
         ...state,
         ...action.payload,

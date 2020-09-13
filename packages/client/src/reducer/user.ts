@@ -2,7 +2,7 @@ import { IUser } from '../../../schema/index'
 
 //State
 
-type State = {
+export type State = {
   [P in keyof IUser]: IUser[P]
 } & {
   isHost: boolean

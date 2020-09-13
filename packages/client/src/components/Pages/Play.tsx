@@ -3,48 +3,71 @@ import styled from 'styled-components'
 import { Row, Col, Button, Input, Space } from 'antd'
 import { SocketContext } from '../../context/SocketContext'
 
-type Props = {
-  isHost: boolean
-  isPlaying: boolean
-}
-
-const _Play: React.FCX<Props> = (props) => {
-  const { room, user } = React.useContext(SocketContext)
+const _Play: React.FCX = (props) => {
+  const { room, user, isPlaying, commands } = React.useContext(SocketContext)
+  const [point, setPoint] = React.useState(0)
+  const draw = React.useCallback(() => {
+    commands?.drawCard(point)
+  }, [point])
   return (
     <>
       <Row className={props.className} justify="center">
         <Col className="play" span={12}>
           <Row justify="center">
             <Space>
-              <Col>{user.isHost && 'You are Host'}</Col>
-              <Col>{!props.isPlaying && <Button>Start</Button>}</Col>
-              {props.isPlaying && (
+              {user?.isHost && (
+                <>
+                  <Col>You are Host!!</Col>
+                  <Col>
+                    {!isPlaying && (
+                      <Button onClick={commands?.startGame}>Start</Button>
+                    )}
+                  </Col>
+                </>
+              )}
+              {isPlaying && (
                 <>
                   <Col>Card:</Col>
                   <Col>
-                    <Input />
+                    <Input onChange={(e) => setPoint(Number(e.target.value))} />
                   </Col>
                   <Col>
-                    <Button>Draw</Button>
+                    <Button onClick={draw}>Draw</Button>
                   </Col>
-                  <Col>{user.name}</Col>
+                  <Col>Your name: {user?.name}</Col>
                 </>
               )}
             </Space>
           </Row>
           <Row justify="center">
-            <Space>{room.members.map((member) => member.name)}</Space>
+            <Space>
+              <ul>
+                {room?.members.some((member) => !member.isDecided) &&
+                  room?.members.map((member) => (
+                    <li>
+                      {member.name}:{' '}
+                      {isPlaying
+                        ? member.isDecided
+                          ? 'picked!'
+                          : 'picking....'
+                        : ''}
+                    </li>
+                  ))}
+                {room?.members.every((member) => member.isDecided) &&
+                  room?.members.map((member) => (
+                    <li>
+                      {member.name}
+                      {member.point}
+                    </li>
+                  ))}
+              </ul>
+            </Space>
           </Row>
         </Col>
         <Col span={12}>Right</Col>
       </Row>
     </>
   )
-}
-
-_Play.defaultProps = {
-  isHost: false,
-  isPlaying: true,
 }
 
 const Play = styled(_Play)`
